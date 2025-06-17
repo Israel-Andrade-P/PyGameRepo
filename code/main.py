@@ -30,7 +30,7 @@ class Player(pygame.sprite.Sprite):
 
         recent_keys = pygame.key.get_just_pressed()
         if recent_keys[pygame.K_SPACE] and self.can_shoot:
-            Laser(laser_surf, self.rect.midtop, all_sprites)
+            Laser(laser_surf, self.rect.midtop, (all_sprites, laser_sprites))
             self.can_shoot = False
             self.laser_shoot_time = pygame.time.get_ticks()
 
@@ -68,6 +68,17 @@ class Meteor(pygame.sprite.Sprite):
         if pygame.time.get_ticks() - self.start_time >= self.life_time:
             self.kill()                         
 
+def collisions():
+    global running
+    collision_sprites = pygame.sprite.spritecollide(player, meteor_sprites, True)
+    if collision_sprites:
+        running = False
+
+    for laser in laser_sprites:
+        collided_sprites = pygame.sprite.spritecollide(laser, meteor_sprites, True)
+        if collided_sprites:
+            laser.kill()
+
 #general setup
 pygame.init()
 SCREEN_WIDTH, SCREEN_HEIGHT = 1180, 620
@@ -84,6 +95,7 @@ meteor_surf = pygame.image.load(join("images", "meteor.png")).convert_alpha()
 #sprites
 all_sprites = pygame.sprite.Group()
 meteor_sprites = pygame.sprite.Group()
+laser_sprites = pygame.sprite.Group()
 for i in range(20):
     Star(star_surf, all_sprites)
 player = Player(all_sprites)
@@ -104,7 +116,8 @@ while running:
 
     #update  
     all_sprites.update(dt)
-    print(pygame.sprite.spritecollide(player, meteor_sprites, False))
+
+    collisions()
     
     #draw the game
     display_surface.fill("darkgrey")
