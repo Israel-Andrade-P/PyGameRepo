@@ -13,6 +13,7 @@ class Game:
         pygame.display.set_caption("Vampire Survivor")
         self.running = True
         self.clock = pygame.time.Clock()
+        
 
         #groups
         self.all_sprites = AllSprites()
@@ -21,7 +22,7 @@ class Game:
         self.setup()
 
         #sprites
-        self.player = Player((400, 300), self.all_sprites, self.collision_sprites)
+        
 
     def setup(self):
         map = load_pygame(join("data", "maps", "world.tmx")) 
@@ -33,7 +34,12 @@ class Game:
             CollisionSprite((obj.x, obj.y), obj.image, (self.all_sprites, self.collision_sprites))
 
         for collision in map.get_layer_by_name("Collisions"):
-            CollisionSprite((collision.x, collision.y), pygame.Surface((collision.width, collision.height)), self.collision_sprites)     
+            CollisionSprite((collision.x, collision.y), pygame.Surface((collision.width, collision.height)), self.collision_sprites)   
+
+        for obj in map.get_layer_by_name("Entities"):
+            if obj.name == "Player":
+                self.player = Player((obj.x, obj.y), self.all_sprites, self.collision_sprites)
+
 
     
     def run(self):
